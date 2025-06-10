@@ -12,6 +12,7 @@
   "activationEvents": [
     "*"
   ],
+  "type": "commonjs",
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -25,15 +26,14 @@
       }
     ],
     "menus": {
-    "editor/context": [
-      {
-        "command": "multi-agent-coder.explainCode",
-        "when": "editorHasSelection",
-        "group": "navigation"
-      }
-    ]
-  }
-
+      "editor/context": [
+        {
+          "command": "multi-agent-coder.explainCode",
+          "when": "editorHasSelection",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -44,14 +44,18 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.100.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
+    "@types/node-fetch": "^2.5.12",
+    "@types/vscode": "^1.100.0",
     "@typescript-eslint/eslint-plugin": "^8.31.1",
     "@typescript-eslint/parser": "^8.31.1",
-    "eslint": "^9.25.1",
-    "typescript": "^5.8.3",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.5.2"
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.25.1",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.0"
   }
 }

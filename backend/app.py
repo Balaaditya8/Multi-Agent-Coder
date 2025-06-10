@@ -3,14 +3,25 @@ from flask_cors import CORS
 import time
 import sys
 import re
+import ollama
 
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:5173"], supports_credentials=True)
+CORS(app, origins=["http://localhost:5000"], supports_credentials=True)
 
-@app.route("/")
-def hello_world():
-    return "<p>Hello, World!</p>"
+@app.route("/explain", methods=['POST'])
+def explain():
+    data = request.json
+    code_snippet = data.get('code', '')
+    response = ollama.chat(
+        model = "codellama:13b",
+        messages=[
+            {"role": "system", "content": "You are a code explainer."},
+            {"role": "user", "content": f"Explain this code: {code_snippet}"}
+        ]
+    )
+    explanation = response['message']['content']
+    return jsonify({'explanation': explanation})
 
 if __name__ == '__main__':
     app.run(debug=True)
