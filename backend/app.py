@@ -16,8 +16,8 @@ def explain():
     response = ollama.chat(
         model = "codellama:13b",
         messages=[
-            {"role": "system", "content": "You are a code explainer."},
-            {"role": "user", "content": f"Explain this code: {code_snippet}"}
+            {"role": "system", "content": "You are a code explainer. Your job is to explain the code's function in simple points"},
+            {"role": "user", "content": f"Explain this code: {code_snippet} shortly"}
         ]
     )
     explanation = response['message']['content']
