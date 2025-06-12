@@ -15,10 +15,21 @@ def explain():
     code_snippet = data.get('code', '')
     response = ollama.chat(
         model = "codellama:13b",
-        messages=[
-            {"role": "system", "content": "You are a code explainer. Your job is to explain the code's function in simple points"},
-            {"role": "user", "content": f"Explain this code: {code_snippet} shortly"}
-        ]
+        messages = [
+    {
+        "role": "system",
+        "content": (
+            "You are a code explainer. Your job is to read a code snippet "
+            "and explain what it does **overall** in a **short and simple** way. "
+            "Use **bullet points**. Avoid line-by-line explanations unless the code is very short. "
+            "Focus on purpose, logic, and any important behavior."
+        )
+    },
+    {
+        "role": "user",
+        "content": f"Explain what the following code does:\n\n{code_snippet}"
+    }
+]
     )
     explanation = response['message']['content']
     return jsonify({'explanation': explanation})

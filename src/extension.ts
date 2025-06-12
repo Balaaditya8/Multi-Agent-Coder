@@ -62,10 +62,16 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {}
 
 function getWebviewContent(content: string): string {
+	const escaped = content
+	  .replace(/`/g, '\\`')   // escape backticks
+	  .replace(/\$/g, '\\$'); // escape $ which breaks string interpolation
+  
 	return `
 	  <!DOCTYPE html>
 	  <html lang="en">
 	  <head>
+		<meta charset="UTF-8">
+		<title>Code Explanation</title>
 		<style>
 		  body {
 			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
@@ -78,22 +84,28 @@ function getWebviewContent(content: string): string {
 			font-size: 1.4em;
 			margin-bottom: 1em;
 		  }
-		  .loader {
-			font-style: italic;
-			color: #888;
-		  }
 		  pre {
 			background: #eee;
 			padding: 1em;
 			border-radius: 8px;
 			overflow-x: auto;
 		  }
+		  code {
+			font-family: monospace;
+		  }
 		</style>
+		<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+		<link rel="stylesheet" href="https://dev.prismjs.com/themes/prism.css" />
 	  </head>
 	  <body>
 		<h1>Explanation</h1>
-		<div>${content || '<span class="loader">Nothing to explain.</span>'}</div>
+		<div id="explanation">Loading...</div>
+		<script>
+		  const raw = \`${escaped}\`;
+		  document.getElementById('explanation').innerHTML = marked.parse(raw);
+		</script>
 	  </body>
-	  </html>`;
+	  </html>
+	`;
   }
-  
+
