@@ -1,10 +1,14 @@
 import * as vscode from 'vscode';
 import fetch from 'node-fetch';
-
+import { saveExplanation } from './History/historyManager';
+import { registerHistoryView } from './History/historyProvider';
+import { HistoryProvider } from './History/historyTree';
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log('Extension is now active!!');
-  
+	
+	const historyProvider = new HistoryProvider(context);
+	vscode.window.registerTreeDataProvider('explanationHistoryView', historyProvider);
 	const disposable = vscode.commands.registerCommand('multi-agent-coder.explainCode', async () => {
 	  const editor = vscode.window.activeTextEditor;
 	  if (!editor) {
@@ -50,6 +54,9 @@ export function activate(context: vscode.ExtensionContext) {
   
 		const explanation = data.explanation || 'No explanation received.';
 		panel.webview.html = getWebviewContent(explanation);
+		
+		saveExplanation(context, text, explanation);
+		historyProvider.refresh();  
 	  } catch (error: any) {
 		vscode.window.showErrorMessage(`Error getting explanation: ${error.message}`);
 		panel.webview.html = getWebviewContent("❌ Failed to fetch explanation.");
@@ -57,11 +64,29 @@ export function activate(context: vscode.ExtensionContext) {
 	});
   
 	context.subscriptions.push(disposable);
+
+	const viewExplanationCommand = vscode.commands.registerCommand(
+		'multi-agent-coder.viewExplanation',
+		(snippet: string, explanation: string) => {
+		  const panel = vscode.window.createWebviewPanel(
+			'codeExplanationView',
+			'Saved Code Explanation',
+			vscode.ViewColumn.Beside,
+			{
+			  enableScripts: true
+			}
+		  );
+	  
+		  panel.webview.html = getWebviewContent(explanation);
+		}
+	  );
+	  context.subscriptions.push(viewExplanationCommand);
+	  
   }
 
 export function deactivate() {}
 
-function getWebviewContent(content: string): string {
+export function getWebviewContent(content: string): string {
 	const escaped = content
 	  .replace(/`/g, '\\`')   // escape backticks
 	  .replace(/\$/g, '\\$'); // escape $ which breaks string interpolation

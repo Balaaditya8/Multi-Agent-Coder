@@ -23,7 +23,12 @@
       {
         "command": "multi-agent-coder.explainCode",
         "title": "Explain Code"
+      },
+      {
+        "command": "multi-agent-coder.viewExplanation",
+        "title": "View Saved Explanation"
       }
+      
     ],
     "menus": {
       "editor/context": [
@@ -31,6 +36,14 @@
           "command": "multi-agent-coder.explainCode",
           "when": "editorHasSelection",
           "group": "navigation"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "explanationHistoryView",
+          "name": "Code Explanation History"
         }
       ]
     }
