@@ -77,11 +77,11 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		  );
 	  
-		  panel.webview.html = getWebviewContent(explanation);
+		  panel.webview.html = getWebviewContentWithSnippet(snippet, explanation);
 		}
 	  );
 	  context.subscriptions.push(viewExplanationCommand);
-	  
+
   }
 
 export function deactivate() {}
@@ -133,4 +133,56 @@ export function getWebviewContent(content: string): string {
 	  </html>
 	`;
   }
+
+  function getWebviewContentWithSnippet(snippet: string, explanation: string): string {
+	const escapedExplanation = explanation.replace(/`/g, '\\`').replace(/\$/g, '\\$');
+	const escapedSnippet = snippet.replace(/`/g, '\\`').replace(/\$/g, '\\$');
+  
+	return `
+	  <!DOCTYPE html>
+	  <html>
+	  <head>
+		<meta charset="UTF-8">
+		<title>Explanation Detail</title>
+		<style>
+		  body {
+			font-family: sans-serif;
+			padding: 1em;
+			background-color: #f8f8f8;
+			color: #333;
+		  }
+		  h2 {
+			margin-top: 1em;
+		  }
+		  pre {
+			background: #f0f0f0;
+			padding: 1em;
+			border-radius: 6px;
+			overflow-x: auto;
+		  }
+		  .section {
+			margin-bottom: 2em;
+		  }
+		</style>
+		<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+	  </head>
+	  <body>
+		<div class="section">
+		  <h2>🧾 Original Code</h2>
+		  <pre><code>${escapedSnippet}</code></pre>
+		</div>
+		<div class="section">
+		  <h2>🧠 Explanation</h2>
+		  <div id="explanation">Loading explanation...</div>
+		</div>
+  
+		<script>
+		  const explanation = \`${escapedExplanation}\`;
+		  document.getElementById('explanation').innerHTML = marked.parse(explanation);
+		</script>
+	  </body>
+	  </html>
+	`;
+  }
+  
 

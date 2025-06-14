@@ -40,7 +40,7 @@ class HistoryItem extends vscode.TreeItem {
   
       this.description = explanation.length > 80 ? explanation.slice(0, 80) + '...' : explanation;
   
-      this.tooltip = `Snippet:\n${snippet}\n\nExplanation:\n${explanation}`;
+      this.tooltip = snippet;
       this.command = {
         title: 'Show Explanation',
         command: 'multi-agent-coder.viewExplanation',
