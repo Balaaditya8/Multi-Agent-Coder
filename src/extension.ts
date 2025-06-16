@@ -1,7 +1,6 @@
 import * as vscode from 'vscode';
 import fetch from 'node-fetch';
 import { saveExplanation } from './History/historyManager';
-import { registerHistoryView } from './History/historyProvider';
 import { HistoryProvider } from './History/historyTree';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -82,6 +81,43 @@ export function activate(context: vscode.ExtensionContext) {
 	  );
 	  context.subscriptions.push(viewExplanationCommand);
 
+
+	  vscode.commands.registerCommand('multi-agent-coder.reExplain', async (item) => {
+		const selectedMode = await vscode.window.showQuickPick(
+		  ['Simplify', 'Optimize', 'Debug'],
+		  { placeHolder: 'Select explanation mode' }
+		);
+	  
+		if (!selectedMode) return;
+	  
+		const panel = vscode.window.createWebviewPanel(
+		  'codeRefiner',
+		  `Refined Explanation (${selectedMode})`,
+		  vscode.ViewColumn.Beside,
+		  { enableScripts: true }
+		);
+		const current: String = "⏳ Generating for  " + selectedMode + '....';
+		panel.webview.html = getWebviewContent("⏳ Re-generating explanation...");
+	  
+		try {
+		  const response = await fetch('http://localhost:5000/refine', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+			  code: item.snippet,
+			  mode: selectedMode.toLowerCase()  // "simplify", "optimize", etc.
+			})
+		  });
+	  
+		  const data = await response.json();
+		  const explanation = data.explanation || 'No explanation returned.';
+		  panel.webview.html = getWebviewContent(explanation);
+		} catch (err) {
+		  vscode.window.showErrorMessage('Failed to re-explain code.');
+		  panel.webview.html = getWebviewContent("❌ Failed to fetch refined explanation.");
+		}
+	  });
+	  
   }
 
 export function deactivate() {}
@@ -123,7 +159,7 @@ export function getWebviewContent(content: string): string {
 		<link rel="stylesheet" href="https://dev.prismjs.com/themes/prism.css" />
 	  </head>
 	  <body>
-		<h1>Explanation</h1>
+		<h1>🧠 Explanation</h1>
 		<div id="explanation">Loading...</div>
 		<script>
 		  const raw = \`${escaped}\`;

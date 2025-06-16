@@ -27,8 +27,11 @@
       {
         "command": "multi-agent-coder.viewExplanation",
         "title": "View Saved Explanation"
+      },
+      {
+        "command": "multi-agent-coder.reExplain",
+        "title": "Re-Explain / Refine"
       }
-      
     ],
     "menus": {
       "editor/context": [
@@ -36,6 +39,13 @@
           "command": "multi-agent-coder.explainCode",
           "when": "editorHasSelection",
           "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "multi-agent-coder.reExplain",
+          "when": "view == explanationHistoryView",
+          "group": "inline"
         }
       ]
     },
